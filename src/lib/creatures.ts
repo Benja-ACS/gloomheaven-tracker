@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import { Monster, Boss, MonsterData, calculateBossHealth, parseSpecialTraits, getCreatureImmunities } from '@/types/gloomhaven'
+import { Monster, Boss, MonsterData, getCreatureImmunities } from '@/types/gloomhaven'
 
 // Fetch monsters from database for a specific level
 export async function fetchMonsters(level: number): Promise<MonsterData[]> {
