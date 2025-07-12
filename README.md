@@ -122,7 +122,39 @@ CREATE POLICY "Allow all operations for now" ON npcs FOR ALL USING (true);
 
 3. **Add Environment Variables**
    - In Vercel dashboard, go to Settings > Environment Variables
-   - Add your Supabase environment variables
+   - Add your Supabase environment variables (see below for where to find them)
+   
+   **Finding your Supabase Environment Variables:**
+   
+   1. Go to your Supabase project dashboard at [supabase.com](https://supabase.com)
+   2. Click on your project
+   3. In the left sidebar, click on **Settings** (gear icon)
+   4. Click on **API** in the settings menu
+   5. You'll see your project credentials:
+   
+   ![Supabase API Settings](https://supabase.com/docs/img/api-url-anon-key.png)
+   
+   - **Project URL**: Copy the "Project URL" value for `NEXT_PUBLIC_SUPABASE_URL`
+   - **Anon Key**: Copy the "anon public" key for `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - **Service Role Key**: Copy the "service_role" key for `SUPABASE_SERVICE_ROLE_KEY` (⚠️ Keep this secret!)
+   
+   **Add these to Vercel:**
+   
+   In your Vercel project dashboard, go to Settings > Environment Variables and create **3 separate variables**:
+   
+   **Variable 1:**
+   - **Name:** `NEXT_PUBLIC_SUPABASE_URL`
+   - **Value:** Your Project URL (e.g., `https://abcdefghijklmnop.supabase.co`)
+   
+   **Variable 2:**
+   - **Name:** `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - **Value:** Your anon public key (e.g., `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`)
+   
+   **Variable 3:**
+   - **Name:** `SUPABASE_SERVICE_ROLE_KEY`
+   - **Value:** Your service_role key (e.g., `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`)
+   
+   💡 **Important:** You create each variable separately by clicking "Add" for each one. The **Name** field gets the variable name (like `NEXT_PUBLIC_SUPABASE_URL`) and the **Value** field gets the actual URL/key from Supabase.
 
 4. **Deploy**
    - Vercel will automatically deploy on every push to main
