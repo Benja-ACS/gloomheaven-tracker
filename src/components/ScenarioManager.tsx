@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Settings, Plus, Heart, Shield, Zap } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import { Scenario, NPC, CONDITIONS, Condition } from '@/types/gloomhaven'
+import { Scenario, NPC, Condition } from '@/types/gloomhaven'
 import { NPCCard } from './NPCCard'
 
 interface ScenarioManagerProps {
@@ -15,11 +15,7 @@ export function ScenarioManager({ scenario, onNewScenario }: ScenarioManagerProp
   const [npcs, setNpcs] = useState<NPC[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadNPCs()
-  }, [scenario.id])
-
-  const loadNPCs = async () => {
+  const loadNPCs = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('npcs')
@@ -34,7 +30,11 @@ export function ScenarioManager({ scenario, onNewScenario }: ScenarioManagerProp
     } finally {
       setLoading(false)
     }
-  }
+  }, [scenario.id])
+
+  useEffect(() => {
+    loadNPCs()
+  }, [loadNPCs])
 
   const updateNPC = async (npcId: string, updates: Partial<NPC>) => {
     try {
