@@ -69,6 +69,88 @@ export type Database = {
           position?: number
         }
       }
+      monsters: {
+        Row: {
+          id: string
+          created_at: string
+          name: string
+          health_level_1: number
+          health_level_2: number
+          health_level_3: number
+          health_level_4: number
+          health_level_5: number
+          health_level_6: number
+          health_level_7: number
+          abilities: string[]
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          name: string
+          health_level_1: number
+          health_level_2: number
+          health_level_3: number
+          health_level_4: number
+          health_level_5: number
+          health_level_6: number
+          health_level_7: number
+          abilities?: string[]
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          name?: string
+          health_level_1?: number
+          health_level_2?: number
+          health_level_3?: number
+          health_level_4?: number
+          health_level_5?: number
+          health_level_6?: number
+          health_level_7?: number
+          abilities?: string[]
+        }
+      }
+      bosses: {
+        Row: {
+          id: string
+          created_at: string
+          name: string
+          health_level_1: number
+          health_level_2: number
+          health_level_3: number
+          health_level_4: number
+          health_level_5: number
+          health_level_6: number
+          health_level_7: number
+          abilities: string[]
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          name: string
+          health_level_1: number
+          health_level_2: number
+          health_level_3: number
+          health_level_4: number
+          health_level_5: number
+          health_level_6: number
+          health_level_7: number
+          abilities?: string[]
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          name?: string
+          health_level_1?: number
+          health_level_2?: number
+          health_level_3?: number
+          health_level_4?: number
+          health_level_5?: number
+          health_level_6?: number
+          health_level_7?: number
+          abilities?: string[]
+        }
+      }
     }
   }
 }

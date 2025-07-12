@@ -48,7 +48,19 @@ export function NPCCard({ npc, onUpdateHealth, onToggleCondition, onDelete }: NP
           )}>
             {npc.name}
           </h3>
-          <p className="text-gray-400 text-sm capitalize">{npc.type}</p>
+          <div className="flex items-center gap-2 text-sm">
+            <p className="text-gray-400 capitalize">{npc.type}</p>
+            {npc.monster_type && (
+              <span className={clsx(
+                'px-2 py-0.5 rounded text-xs font-medium',
+                npc.monster_type === 'Elite' ? 'bg-yellow-600/30 text-yellow-200' :
+                npc.monster_type === 'Boss' ? 'bg-red-600/30 text-red-200' :
+                'bg-blue-600/30 text-blue-200'
+              )}>
+                {npc.monster_type}
+              </span>
+            )}
+          </div>
         </div>
         <button
           onClick={onDelete}
@@ -108,6 +120,61 @@ export function NPCCard({ npc, onUpdateHealth, onToggleCondition, onDelete }: NP
           </button>
         </div>
       </div>
+
+      {/* Stats */}
+      {(npc.move || npc.attack || npc.range) && (
+        <div className="mb-4">
+          <div className="grid grid-cols-3 gap-2 text-center">
+            {npc.move && (
+              <div className="bg-white/10 p-2 rounded">
+                <div className="text-xs text-gray-400">Move</div>
+                <div className="text-white font-bold">{npc.move}</div>
+              </div>
+            )}
+            {npc.attack && (
+              <div className="bg-white/10 p-2 rounded">
+                <div className="text-xs text-gray-400">Attack</div>
+                <div className="text-white font-bold">{npc.attack}</div>
+              </div>
+            )}
+            {npc.range && (
+              <div className="bg-white/10 p-2 rounded">
+                <div className="text-xs text-gray-400">Range</div>
+                <div className="text-white font-bold">{npc.range}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Special Traits & Immunities */}
+      {(npc.special_traits || (npc.immunities && npc.immunities.length > 0)) && (
+        <div className="mb-4">
+          {npc.special_traits && (
+            <div className="mb-2">
+              <div className="text-xs text-gray-400 mb-1">Special Traits</div>
+              <div className="text-sm text-blue-300 bg-blue-600/20 p-2 rounded">
+                {npc.special_traits}
+              </div>
+            </div>
+          )}
+          {npc.immunities && npc.immunities.length > 0 && (
+            <div>
+              <div className="text-xs text-gray-400 mb-1">Immunities</div>
+              <div className="flex flex-wrap gap-1">
+                {npc.immunities.map((immunity, index) => (
+                  <span
+                    key={index}
+                    className="bg-red-600/30 text-red-200 px-2 py-0.5 rounded text-xs"
+                  >
+                    {immunity}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Quick Actions */}
       <div className="flex gap-2 mb-4">

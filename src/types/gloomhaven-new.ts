@@ -19,9 +19,9 @@ export interface NPC {
   conditions: string[]
   abilities: string[]
   position: number
-  move?: string // Can be "-" for immobile or a number as string
-  attack?: string // Can be variable like "3+X" or numeric as string
-  range?: string // Can be "-" for melee or a number as string
+  move?: number
+  attack?: string
+  range?: string
   special_traits?: string
   immunities?: string[]
   notes?: string
@@ -35,7 +35,7 @@ export interface Monster {
   level: number
   type: 'Normal' | 'Elite'
   hp: number
-  move: string // Can be "-" for immobile or a number as string
+  move: number
   attack: number
   range: string
   special_traits?: string
@@ -48,7 +48,7 @@ export interface Boss {
   level: number
   type: string
   hp: string // Format like "8×C"
-  move?: string // Can be "-" for immobile or a number as string
+  move?: number
   attack: string // Can include variables like "3+X"
   range: string
   special_traits?: string
@@ -72,7 +72,7 @@ export interface MonsterData {
   level: number
   type: 'Normal' | 'Elite' | 'Boss'
   hp: number | string
-  move?: string // Can be "-" for immobile or a number as string
+  move?: number
   attack: number | string
   range: string
   special_traits?: string

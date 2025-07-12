@@ -94,6 +94,16 @@ export function ScenarioManager({ scenario, onNewScenario }: ScenarioManagerProp
   const aliveNPCs = npcs.filter(npc => npc.current_health > 0)
   const deadNPCs = npcs.filter(npc => npc.current_health === 0)
 
+  // Group NPCs by group_name for better organization
+  const groupedNPCs = npcs.reduce((groups, npc) => {
+    const groupName = npc.group_name || 'Other'
+    if (!groups[groupName]) {
+      groups[groupName] = []
+    }
+    groups[groupName].push(npc)
+    return groups
+  }, {} as Record<string, NPC[]>)
+
   if (loading) {
     return (
       <div className="text-center text-white">
@@ -166,35 +176,53 @@ export function ScenarioManager({ scenario, onNewScenario }: ScenarioManagerProp
         </div>
       </div>
 
-      {/* NPCs Grid */}
+      {/* NPCs Grid - Grouped by type */}
       {npcs.length === 0 ? (
         <div className="text-center text-gray-300 py-12">
           <p>No NPCs in this scenario yet.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Alive NPCs first */}
-          {aliveNPCs.map((npc) => (
-            <NPCCard
-              key={npc.id}
-              npc={npc}
-              onUpdateHealth={(newHealth: number) => updateHealth(npc.id, newHealth)}
-              onToggleCondition={(condition: Condition) => toggleCondition(npc.id, condition)}
-              onDelete={() => deleteNPC(npc.id)}
-            />
-          ))}
-          
-          {/* Dead NPCs last, with reduced opacity */}
-          {deadNPCs.map((npc) => (
-            <div key={npc.id} className="opacity-50">
-              <NPCCard
-                npc={npc}
-                onUpdateHealth={(newHealth: number) => updateHealth(npc.id, newHealth)}
-                onToggleCondition={(condition: Condition) => toggleCondition(npc.id, condition)}
-                onDelete={() => deleteNPC(npc.id)}
-              />
-            </div>
-          ))}
+        <div className="space-y-6">
+          {Object.entries(groupedNPCs).map(([groupName, groupNPCs]) => {
+            const aliveInGroup = groupNPCs.filter(npc => npc.current_health > 0)
+            const deadInGroup = groupNPCs.filter(npc => npc.current_health === 0)
+            
+            return (
+              <div key={groupName} className="bg-white/5 backdrop-blur-sm rounded-xl p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-white">{groupName}</h3>
+                  <div className="text-sm text-gray-300">
+                    {aliveInGroup.length} alive • {deadInGroup.length} defeated
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Alive NPCs first */}
+                  {aliveInGroup.map((npc) => (
+                    <NPCCard
+                      key={npc.id}
+                      npc={npc}
+                      onUpdateHealth={(newHealth: number) => updateHealth(npc.id, newHealth)}
+                      onToggleCondition={(condition: Condition) => toggleCondition(npc.id, condition)}
+                      onDelete={() => deleteNPC(npc.id)}
+                    />
+                  ))}
+                  
+                  {/* Dead NPCs last, with reduced opacity */}
+                  {deadInGroup.map((npc) => (
+                    <div key={npc.id} className="opacity-50">
+                      <NPCCard
+                        npc={npc}
+                        onUpdateHealth={(newHealth: number) => updateHealth(npc.id, newHealth)}
+                        onToggleCondition={(condition: Condition) => toggleCondition(npc.id, condition)}
+                        onDelete={() => deleteNPC(npc.id)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>
