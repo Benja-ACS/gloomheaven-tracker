@@ -137,14 +137,17 @@ export function ScenarioCreator({ onScenarioCreated, onCancel }: ScenarioCreator
       for (const selectedCreature of selectedCreatures) {
         const { monster, normalCount, eliteCount, creatureType } = selectedCreature
         
+        // Start numbering for this monster type from 1
+        let currentNumber = 1
+        
         // Add Normal type creatures
         for (let i = 0; i < normalCount; i++) {
           const health = calculateHealth(monster)
-          const groupName = `${monster.name} (${creatureType === 'boss' ? 'Boss' : 'Normal'})`
+          const groupName = monster.name // Group by monster name only
           
           npcsToCreate.push({
             scenario_id: scenario.id,
-            name: `${monster.name} ${creatureType === 'boss' ? '' : 'Normal '}${i + 1}`,
+            name: `${monster.name} ${creatureType === 'boss' ? '' : 'Normal '}${currentNumber}`,
             type: creatureType,
             monster_type: creatureType === 'boss' ? 'Boss' : 'Normal',
             max_health: health,
@@ -160,6 +163,7 @@ export function ScenarioCreator({ onScenarioCreated, onCancel }: ScenarioCreator
             notes: monster.notes,
             group_name: groupName
           })
+          currentNumber++
         }
 
         // Add Elite type creatures (only for monsters)
@@ -168,11 +172,11 @@ export function ScenarioCreator({ onScenarioCreated, onCancel }: ScenarioCreator
           const eliteData = await getMonsterByNameAndLevel(monster.name, scenarioLevel, 'Elite')
           if (eliteData) {
             const health = calculateHealth(eliteData)
-            const groupName = `${monster.name} (Elite)`
+            const groupName = monster.name // Group by monster name only, not type
             
             npcsToCreate.push({
               scenario_id: scenario.id,
-              name: `${monster.name} Elite ${i + 1}`,
+              name: `${monster.name} Elite ${currentNumber}`,
               type: creatureType,
               monster_type: 'Elite',
               max_health: health,
@@ -188,6 +192,7 @@ export function ScenarioCreator({ onScenarioCreated, onCancel }: ScenarioCreator
               notes: eliteData.notes,
               group_name: groupName
             })
+            currentNumber++
           }
         }
       }
