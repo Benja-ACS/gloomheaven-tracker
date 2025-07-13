@@ -5,6 +5,9 @@ import { X, Plus, Minus, Users } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { fetchUniqueMonsters, fetchUniqueBosses, getMonsterByNameAndLevel, getBossByNameAndLevel } from '@/lib/creatures'
 import { Scenario, MonsterData, SelectedCreature, calculateBossHealth } from '@/types/gloomhaven'
+import { Button } from '@/components/ui/Button'
+import { Card, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Loading } from '@/components/ui/Loading'
 
 interface ScenarioCreatorProps {
   onScenarioCreated: (scenario: Scenario) => void
@@ -208,26 +211,26 @@ export function ScenarioCreator({ onScenarioCreated, onCancel }: ScenarioCreator
 
   if (loading) {
     return (
-      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 max-w-4xl mx-auto">
-        <div className="text-center text-white">
-          <div className="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent rounded-full"></div>
-          <p className="mt-2">Loading creatures...</p>
-        </div>
-      </div>
+      <Card className="max-w-4xl mx-auto" variant="glass" padding="lg">
+        <Loading text="Loading creatures..." size="lg" className="py-8" />
+      </Card>
     )
   }
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-white">Create New Scenario</h2>
-        <button
-          onClick={onCancel}
-          className="text-gray-400 hover:text-white transition-colors"
-        >
-          <X className="w-6 h-6" />
-        </button>
-      </div>
+    <Card className="max-w-6xl mx-auto animate-scale-in" variant="elevated" padding="lg">
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <CardTitle>Create New Scenario</CardTitle>
+          <Button
+            onClick={onCancel}
+            variant="ghost"
+            size="icon"
+          >
+            <X className="w-6 h-6" />
+          </Button>
+        </div>
+      </CardHeader>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Scenario Details */}
@@ -429,20 +432,23 @@ export function ScenarioCreator({ onScenarioCreated, onCancel }: ScenarioCreator
       </div>
 
       <div className="flex gap-4 mt-6">
-        <button
+        <Button
           onClick={handleCreateScenario}
           disabled={!scenarioName.trim() || isCreating}
-          className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 disabled:cursor-not-allowed"
+          size="lg"
+          className="flex-1"
         >
           {isCreating ? 'Creating...' : 'Create Scenario'}
-        </button>
-        <button
+        </Button>
+        
+        <Button
           onClick={onCancel}
-          className="px-6 py-3 border border-gray-400 hover:border-gray-300 text-gray-300 hover:text-white rounded-lg font-semibold transition-colors"
+          variant="outline"
+          size="lg"
         >
           Cancel
-        </button>
+        </Button>
       </div>
-    </div>
+    </Card>
   )
 }
