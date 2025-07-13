@@ -1,4 +1,5 @@
 name: Build and Test
+# Clean workflow - no environment variables needed
 
 on:
   push:
