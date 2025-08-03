@@ -4,13 +4,16 @@ import { useState } from 'react'
 import { Plus, Sword, Shield, Menu, House, BookOpen, Settings } from 'lucide-react'
 import { ScenarioCreator } from '@/components/ScenarioCreator'
 import { ScenarioManager } from '@/components/ScenarioManager'
+import { BackgroundWrapper } from '@/components/ui/BackgroundWrapper'
 import { Button } from '@/components/ui/Button'
 import { Scenario } from '@/types/gloomhaven'
+import { useTheme } from '@/contexts/ThemeContext'
 
 export default function Home() {
   const [currentScenario, setCurrentScenario] = useState<Scenario | null>(null)
   const [showCreator, setShowCreator] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const { logo } = useTheme()
 
   const handleScenarioCreated = (scenario: Scenario) => {
     setCurrentScenario(scenario)
@@ -28,7 +31,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <BackgroundWrapper>
       {/* Enhanced Header with Navigation */}
       <header className="bg-black/20 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -36,8 +39,18 @@ export default function Home() {
             {/* Logo/Title */}
             <div className="flex items-center gap-3">
               <div className="relative">
-                <Sword className="text-yellow-400 w-8 h-8" />
-                <Shield className="text-blue-400 w-5 h-5 absolute -top-1 -right-1" />
+                {logo ? (
+                  <img 
+                    src={logo} 
+                    alt="Gloomhaven Logo" 
+                    className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain"
+                  />
+                ) : (
+                  <>
+                    <Sword className="text-yellow-400 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16" />
+                    <Shield className="text-blue-400 w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 absolute -top-1 -right-1" />
+                  </>
+                )}
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">Gloomhaven Tracker</h1>
@@ -214,6 +227,6 @@ export default function Home() {
           ) : null}
         </main>
       </div>
-    </div>
+    </BackgroundWrapper>
   )
 }

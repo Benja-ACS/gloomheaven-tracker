@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { Scenario, NPC, Condition, MonsterData } from '@/types/gloomhaven'
 import { fetchUniqueMonsters, fetchUniqueBosses, getMonsterByNameAndLevel, getBossByNameAndLevel } from '@/lib/creatures'
 import { NPCCard } from './NPCCard'
+import { CreatureImage } from './ui/CreatureImage'
 
 interface ScenarioManagerProps {
   scenario: Scenario
@@ -370,7 +371,14 @@ export function ScenarioManager({ scenario, onNewScenario }: ScenarioManagerProp
             return (
               <div key={groupName} className="bg-white/5 backdrop-blur-sm rounded-xl p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-white">{groupName}</h3>
+                  <div className="flex items-center gap-3">
+                    <CreatureImage 
+                      creatureName={groupName}
+                      type={groupNPCs[0]?.type || 'monster'}
+                      size="lg"
+                    />
+                    <h3 className="text-lg font-semibold text-white">{groupName}</h3>
+                  </div>
                   <div className="text-sm text-gray-300">
                     {aliveInGroup.length} alive • {deadInGroup.length} defeated
                   </div>

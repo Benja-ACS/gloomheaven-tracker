@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Heart, Minus, Plus, Trash2, Eye, EyeOff } from 'lucide-react'
 import { NPC, CONDITIONS, Condition } from '@/types/gloomhaven'
+import { CreatureImage } from './ui/CreatureImage'
 import clsx from 'clsx'
 
 interface NPCCardProps {
@@ -41,25 +42,32 @@ export function NPCCard({ npc, onUpdateHealth, onToggleCondition, onDelete }: NP
     )}>
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <div>
-          <h3 className={clsx(
-            'font-bold text-lg',
-            npc.type === 'boss' ? 'text-yellow-300' : 'text-white'
-          )}>
-            {npc.name}
-          </h3>
-          <div className="flex items-center gap-2 text-sm">
-            <p className="text-gray-400 capitalize">{npc.type}</p>
-            {npc.monster_type && (
-              <span className={clsx(
-                'px-2 py-0.5 rounded text-xs font-medium',
-                npc.monster_type === 'Elite' ? 'bg-yellow-600/30 text-yellow-200' :
-                npc.monster_type === 'Boss' ? 'bg-red-600/30 text-red-200' :
-                'bg-blue-600/30 text-blue-200'
-              )}>
-                {npc.monster_type}
-              </span>
-            )}
+        <div className="flex items-center gap-3">
+          <CreatureImage 
+            creatureName={npc.group_name || npc.name.split(' ')[0] + ' ' + npc.name.split(' ')[1]}
+            type={npc.type}
+            size="sm"
+          />
+          <div>
+            <h3 className={clsx(
+              'font-bold text-lg',
+              npc.type === 'boss' ? 'text-yellow-300' : 'text-white'
+            )}>
+              {npc.name}
+            </h3>
+            <div className="flex items-center gap-2 text-sm">
+              <p className="text-gray-400 capitalize">{npc.type}</p>
+              {npc.monster_type && (
+                <span className={clsx(
+                  'px-2 py-0.5 rounded text-xs font-medium',
+                  npc.monster_type === 'Elite' ? 'bg-yellow-600/30 text-yellow-200' :
+                  npc.monster_type === 'Boss' ? 'bg-red-600/30 text-red-200' :
+                  'bg-blue-600/30 text-blue-200'
+                )}>
+                  {npc.monster_type}
+                </span>
+              )}
+            </div>
           </div>
         </div>
         <button

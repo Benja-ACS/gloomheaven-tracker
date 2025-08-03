@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Plus, Minus, Users } from 'lucide-react'
+import { X, Plus, Minus, Users, Search } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { fetchUniqueMonsters, fetchUniqueBosses, getMonsterByNameAndLevel, getBossByNameAndLevel } from '@/lib/creatures'
 import { Scenario, MonsterData, SelectedCreature, calculateBossHealth } from '@/types/gloomhaven'
 import { Button } from '@/components/ui/Button'
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Loading } from '@/components/ui/Loading'
+import { CreatureImage } from '@/components/ui/CreatureImage'
 
 interface ScenarioCreatorProps {
   onScenarioCreated: (scenario: Scenario) => void
@@ -23,6 +24,8 @@ export function ScenarioCreator({ onScenarioCreated, onCancel }: ScenarioCreator
   const [uniqueMonsters, setUniqueMonsters] = useState<string[]>([])
   const [uniqueBosses, setUniqueBosses] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+  const [monsterSearch, setMonsterSearch] = useState('')
+  const [bossSearch, setBossSearch] = useState('')
 
   useEffect(() => {
     const loadCreatureNames = async () => {
@@ -42,6 +45,15 @@ export function ScenarioCreator({ onScenarioCreated, onCancel }: ScenarioCreator
 
     loadCreatureNames()
   }, [])
+
+  // Filter monsters and bosses based on search
+  const filteredMonsters = uniqueMonsters.filter(monster =>
+    monster.toLowerCase().includes(monsterSearch.toLowerCase())
+  )
+
+  const filteredBosses = uniqueBosses.filter(boss =>
+    boss.toLowerCase().includes(bossSearch.toLowerCase())
+  )
 
   const handleAddCreature = async (name: string, creatureType: 'monster' | 'boss', monsterType?: 'Normal' | 'Elite') => {
     try {
@@ -96,6 +108,9 @@ export function ScenarioCreator({ onScenarioCreated, onCancel }: ScenarioCreator
             return { ...sc, normalCount: sc.normalCount - 1 }
           } else if (monsterType === 'Elite' && sc.eliteCount > 0) {
             return { ...sc, eliteCount: sc.eliteCount - 1 }
+          } else if (monsterType === 'Boss' && sc.normalCount > 0) {
+            // For bosses, we use normalCount to track the boss count
+            return { ...sc, normalCount: sc.normalCount - 1 }
           }
         }
         return sc
@@ -301,12 +316,32 @@ export function ScenarioCreator({ onScenarioCreated, onCancel }: ScenarioCreator
                     className="bg-white/10 p-3 rounded-lg"
                   >
                     <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-white font-medium">{sc.monster.name}</span>
-                        <span className="text-gray-300 ml-2 text-sm">
-                          ({sc.creatureType === 'boss' ? 'Boss' : 'Monster'})
-                        </span>
+                      <div className="flex items-center gap-3">
+                        <CreatureImage 
+                          creatureName={sc.monster.name}
+                          type={sc.creatureType}
+                          size="lg"
+                        />
+                        <div>
+                          <span className="text-white font-medium">{sc.monster.name}</span>
+                          <span className="text-gray-300 ml-2 text-sm">
+                            ({sc.creatureType === 'boss' ? 'Boss' : 'Monster'})
+                          </span>
+                        </div>
                       </div>
+                      <button
+                        onClick={() => {
+                          setSelectedCreatures(prev => 
+                            prev.filter(creature => 
+                              !(creature.monster.name === sc.monster.name && creature.creatureType === sc.creatureType)
+                            )
+                          )
+                        }}
+                        className="text-gray-400 hover:text-red-400 transition-colors p-1"
+                        title="Remove this creature completely"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
                     
                     {sc.creatureType === 'monster' && (
@@ -394,11 +429,49 @@ export function ScenarioCreator({ onScenarioCreated, onCancel }: ScenarioCreator
         {/* Creature Selection */}
         <div className="space-y-4">
           <div>
-            <h3 className="text-white font-medium mb-3">Monsters</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-white font-medium">Monsters</h3>
+              <span className="text-gray-400 text-sm">
+                {filteredMonsters.length} of {uniqueMonsters.length}
+              </span>
+            </div>
+            
+            {/* Monster Search */}
+            <div className="mb-3 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search monsters..."
+                value={monsterSearch}
+                onChange={(e) => setMonsterSearch(e.target.value)}
+                className="w-full pl-10 pr-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-blue-400 text-sm"
+              />
+              {monsterSearch && (
+                <button
+                  onClick={() => setMonsterSearch('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            
             <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto">
-              {uniqueMonsters.map((monsterName) => (
+              {filteredMonsters.length === 0 && monsterSearch ? (
+                <div className="text-gray-400 text-center py-4">
+                  No monsters found matching &quot;{monsterSearch}&quot;
+                </div>
+              ) : (
+                filteredMonsters.map((monsterName) => (
                 <div key={monsterName} className="bg-white/10 rounded-lg p-3">
-                  <div className="text-white font-medium mb-2">{monsterName}</div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <CreatureImage 
+                      creatureName={monsterName}
+                      type="monster"
+                      size="lg"
+                    />
+                    <div className="text-white font-medium">{monsterName}</div>
+                  </div>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => handleAddCreature(monsterName, 'monster', 'Normal')}
@@ -414,23 +487,65 @@ export function ScenarioCreator({ onScenarioCreated, onCancel }: ScenarioCreator
                     </button>
                   </div>
                 </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
           <div>
-            <h3 className="text-white font-medium mb-3">Bosses</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-white font-medium">Bosses</h3>
+              <span className="text-gray-400 text-sm">
+                {filteredBosses.length} of {uniqueBosses.length}
+              </span>
+            </div>
+            
+            {/* Boss Search */}
+            <div className="mb-3 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search bosses..."
+                value={bossSearch}
+                onChange={(e) => setBossSearch(e.target.value)}
+                className="w-full pl-10 pr-3 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:border-red-400 text-sm"
+              />
+              {bossSearch && (
+                <button
+                  onClick={() => setBossSearch('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            
             <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto">
-              {uniqueBosses.map((bossName) => (
+              {filteredBosses.length === 0 && bossSearch ? (
+                <div className="text-gray-400 text-center py-4">
+                  No bosses found matching &quot;{bossSearch}&quot;
+                </div>
+              ) : (
+                filteredBosses.map((bossName) => (
                 <button
                   key={bossName}
                   onClick={() => handleAddCreature(bossName, 'boss')}
                   className="text-left p-3 bg-red-600/20 hover:bg-red-600/30 rounded-lg transition-colors border border-red-600/50"
                 >
-                  <div className="text-red-200 font-medium">{bossName}</div>
-                  <div className="text-red-300 text-sm">Boss Creature</div>
+                  <div className="flex items-center gap-3">
+                    <CreatureImage 
+                      creatureName={bossName}
+                      type="boss"
+                      size="lg"
+                    />
+                    <div>
+                      <div className="text-red-200 font-medium">{bossName}</div>
+                      <div className="text-red-300 text-sm">Boss Creature</div>
+                    </div>
+                  </div>
                 </button>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
