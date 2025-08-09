@@ -9,6 +9,15 @@ export function getStorageUrl(bucket: string, path: string): string {
 }
 
 /**
+ * Get condition icon URL from the conditions bucket
+ */
+export function getConditionIconUrl(conditionName: string): string {
+  // Convert condition name to lowercase and add .png extension
+  const fileName = `${conditionName.toLowerCase()}.png`
+  return getStorageUrl('conditions', fileName)
+}
+
+/**
  * Get theme assets from the themes bucket
  */
 export async function getThemeAssets() {
@@ -22,9 +31,10 @@ export async function getThemeAssets() {
     const assets = {
       background: null as string | null,
       logo: null as string | null,
+      title: null as string | null,
     }
 
-    // Find background and logo files
+    // Find background, logo, and title files
     data?.forEach(file => {
       if (file.name.toLowerCase().includes('background') || file.name.toLowerCase().includes('bg')) {
         assets.background = getStorageUrl('themes', file.name)
@@ -32,12 +42,15 @@ export async function getThemeAssets() {
       if (file.name.toLowerCase().includes('logo')) {
         assets.logo = getStorageUrl('themes', file.name)
       }
+      if (file.name.toLowerCase() === 'gh_title.png' || file.name.toLowerCase().includes('gh_title')) {
+        assets.title = getStorageUrl('themes', file.name)
+      }
     })
 
     return assets
   } catch (error) {
     console.error('Error fetching theme assets:', error)
-    return { background: null, logo: null }
+    return { background: null, logo: null, title: null }
   }
 }
 

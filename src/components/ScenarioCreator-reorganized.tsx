@@ -55,7 +55,7 @@ export function ScenarioCreator({ onScenarioCreated, onCancel, initialConfig }: 
   const handleAddCreature = async (name: string, creatureType: 'monster' | 'boss', monsterType?: 'Normal' | 'Elite') => {
     try {
       let creatureData: MonsterData | null = null
-      
+
       if (creatureType === 'monster' && monsterType) {
         creatureData = await getMonsterByNameAndLevel(name, scenarioLevel, monsterType)
       } else if (creatureType === 'boss') {
@@ -64,29 +64,24 @@ export function ScenarioCreator({ onScenarioCreated, onCancel, initialConfig }: 
 
       if (!creatureData) return
 
-      const existing = selectedCreatures.find(sc => 
-        sc.monster.name === name && sc.creatureType === creatureType
+      const existingIndex = selectedCreatures.findIndex(
+        (sc) => sc.monster.name === name && sc.creatureType === creatureType
       )
 
-      if (existing) {
-        setSelectedCreatures(prev => 
-          prev.map(sc => {
-            if (sc.monster.name === name && sc.creatureType === creatureType) {
-              if (creatureType === 'monster' && monsterType === 'Elite') {
-                return { ...sc, eliteCount: sc.eliteCount + 1 }
-              } else {
-                return { ...sc, normalCount: sc.normalCount + 1 }
-              }
-            }
-            return sc
-          })
-        )
+      if (existingIndex !== -1) {
+        const updated = [...selectedCreatures]
+        if (creatureType === 'monster' && monsterType === 'Elite') {
+          updated[existingIndex].eliteCount += 1
+        } else {
+          updated[existingIndex].normalCount += 1
+        }
+        setSelectedCreatures(updated)
       } else {
         const normalCount = creatureType === 'monster' && monsterType === 'Elite' ? 0 : 1
         const eliteCount = creatureType === 'monster' && monsterType === 'Elite' ? 1 : 0
         
-        setSelectedCreatures(prev => [...prev, {
-          monster: creatureData!,
+        setSelectedCreatures([...selectedCreatures, {
+          monster: creatureData,
           creatureType,
           normalCount,
           eliteCount
@@ -122,7 +117,6 @@ export function ScenarioCreator({ onScenarioCreated, onCancel, initialConfig }: 
 
   const calculateHealth = (creature: MonsterData): number => {
     if (typeof creature.hp === 'string') {
-      // Boss health with multiplier
       return calculateBossHealth(creature.hp, playerCount)
     }
     return creature.hp
@@ -139,61 +133,31 @@ export function ScenarioCreator({ onScenarioCreated, onCancel, initialConfig }: 
           name: scenarioName,
           level: scenarioLevel,
           created_at: new Date().toISOString(),
-          player_count: playerCount,
-          user_id: 'demo-user' // In a real app, this would come from auth
+          player_count: playerCount
         })
         .select()
         .single()
 
       if (scenarioError) throw scenarioError
 
-      // Create NPCs with proper numbering
-      let currentPosition = 1
-      
+      // Create NPCs with elite data
       for (const sc of selectedCreatures) {
-        // Track numbers for this monster group
-        let monsterNumber = 1
-        
-        // Add normal creatures (monsters) or bosses
+        // Add normal creatures
         for (let i = 0; i < sc.normalCount; i++) {
-          let creatureData = sc.monster
-          
-          // For bosses, refresh data with current scenario level
-          if (sc.creatureType === 'boss') {
-            const refreshedBossData = await getBossByNameAndLevel(sc.monster.name, scenarioLevel)
-            if (refreshedBossData) {
-              creatureData = refreshedBossData
-            }
-          }
-          
-          const npcName = sc.creatureType === 'monster' 
-            ? `${creatureData.name} Normal ${monsterNumber}`
-            : `${creatureData.name} ${monsterNumber}`
-            
           const { error } = await supabase
             .from('npcs')
             .insert({
               scenario_id: scenarioData.id,
-              name: npcName,
-              max_health: calculateHealth(creatureData),
-              current_health: calculateHealth(creatureData),
-              type: sc.creatureType,
+              name: sc.monster.name,
+              max_health: calculateHealth(sc.monster),
+              current_health: calculateHealth(sc.monster),
+              level: scenarioLevel,
+              creature_type: sc.creatureType,
               monster_type: sc.creatureType === 'monster' ? 'Normal' : 'Boss',
-              position: currentPosition,
-              move: creatureData.move || '',
-              attack: String(creatureData.attack || ''),
-              range: creatureData.range || '',
-              special_traits: creatureData.special_traits || '',
-              conditions: [],
-              abilities: creatureData.special_actions || [],
-              immunities: [],
-              notes: creatureData.notes || '',
-              group_name: creatureData.name // Each monster type gets its own group
+              position: 0
             })
 
           if (error) throw error
-          monsterNumber++
-          currentPosition++
         }
 
         // Add elite creatures for monsters
@@ -201,32 +165,20 @@ export function ScenarioCreator({ onScenarioCreated, onCancel, initialConfig }: 
           const eliteData = await getMonsterByNameAndLevel(sc.monster.name, scenarioLevel, 'Elite')
           if (eliteData) {
             for (let i = 0; i < sc.eliteCount; i++) {
-              const npcName = `${eliteData.name} Elite ${monsterNumber}`
-              
               const { error } = await supabase
                 .from('npcs')
                 .insert({
                   scenario_id: scenarioData.id,
-                  name: npcName,
-                  max_health: calculateHealth(eliteData),
-                  current_health: calculateHealth(eliteData),
-                  type: 'monster',
+                  name: eliteData.name,
+                  max_health: eliteData.hp,
+                  current_health: eliteData.hp,
+                  level: scenarioLevel,
+                  creature_type: 'monster',
                   monster_type: 'Elite',
-                  position: currentPosition,
-                  move: eliteData.move || '',
-                  attack: String(eliteData.attack || ''),
-                  range: eliteData.range || '',
-                  special_traits: eliteData.special_traits || '',
-                  conditions: [],
-                  abilities: eliteData.special_actions || [],
-                  immunities: [],
-                  notes: eliteData.notes || '',
-                  group_name: sc.monster.name // Same group as normal monsters
+                  position: 0
                 })
 
               if (error) throw error
-              monsterNumber++
-              currentPosition++
             }
           }
         }
@@ -496,18 +448,18 @@ export function ScenarioCreator({ onScenarioCreated, onCancel, initialConfig }: 
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleRemoveCreature(sc.monster.name, sc.creatureType, 'Normal')}
-                              className="text-red-400 hover:text-red-300 p-1"
+                              className="text-red-400 hover:text-red-300"
                             >
-                              <Minus className="w-5 h-5" />
+                              <Minus className="w-3 h-3" />
                             </button>
                             <span className="text-white text-sm min-w-[20px] text-center">
                               {sc.normalCount}
                             </span>
                             <button
                               onClick={() => handleAddCreature(sc.monster.name, sc.creatureType, 'Normal')}
-                              className="text-green-400 hover:text-green-300 p-1"
+                              className="text-green-400 hover:text-green-300"
                             >
-                              <Plus className="w-5 h-5" />
+                              <Plus className="w-3 h-3" />
                             </button>
                           </div>
                         </div>
@@ -518,18 +470,18 @@ export function ScenarioCreator({ onScenarioCreated, onCancel, initialConfig }: 
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleRemoveCreature(sc.monster.name, sc.creatureType, 'Elite')}
-                              className="text-red-400 hover:text-red-300 p-1"
+                              className="text-red-400 hover:text-red-300"
                             >
-                              <Minus className="w-5 h-5" />
+                              <Minus className="w-3 h-3" />
                             </button>
                             <span className="text-white text-sm min-w-[20px] text-center">
                               {sc.eliteCount}
                             </span>
                             <button
                               onClick={() => handleAddCreature(sc.monster.name, sc.creatureType, 'Elite')}
-                              className="text-green-400 hover:text-green-300 p-1"
+                              className="text-green-400 hover:text-green-300"
                             >
-                              <Plus className="w-5 h-5" />
+                              <Plus className="w-3 h-3" />
                             </button>
                           </div>
                         </div>
@@ -543,18 +495,18 @@ export function ScenarioCreator({ onScenarioCreated, onCancel, initialConfig }: 
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleRemoveCreature(sc.monster.name, sc.creatureType, 'Boss')}
-                              className="text-red-400 hover:text-red-300 p-1"
+                              className="text-red-400 hover:text-red-300"
                             >
-                              <Minus className="w-5 h-5" />
+                              <Minus className="w-3 h-3" />
                             </button>
                             <span className="text-white text-sm min-w-[20px] text-center">
                               {sc.normalCount}
                             </span>
                             <button
                               onClick={() => handleAddCreature(sc.monster.name, sc.creatureType)}
-                              className="text-green-400 hover:text-green-300 p-1"
+                              className="text-green-400 hover:text-green-300"
                             >
-                              <Plus className="w-5 h-5" />
+                              <Plus className="w-3 h-3" />
                             </button>
                           </div>
                         </div>

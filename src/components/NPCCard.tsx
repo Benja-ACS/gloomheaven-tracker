@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Heart, Minus, Plus, Trash2, Eye, EyeOff } from 'lucide-react'
 import { NPC, CONDITIONS, Condition } from '@/types/gloomhaven'
 import { CreatureImage } from './ui/CreatureImage'
+import { ConditionIcon } from './ui/ConditionIcon'
 import clsx from 'clsx'
 
 interface NPCCardProps {
@@ -101,13 +102,13 @@ export function NPCCard({ npc, onUpdateHealth, onToggleCondition, onDelete }: NP
         </div>
 
         {/* Health Controls */}
-        <div className="flex items-center justify-center gap-2 mt-2">
+        <div className="flex items-center justify-center gap-3 mt-2">
           <button
             onClick={() => onUpdateHealth(npc.current_health - 1)}
             disabled={npc.current_health <= 0}
-            className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white p-1 rounded"
+            className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white p-2 rounded-lg"
           >
-            <Minus className="w-4 h-4" />
+            <Minus className="w-6 h-6" />
           </button>
           
           <input
@@ -122,9 +123,9 @@ export function NPCCard({ npc, onUpdateHealth, onToggleCondition, onDelete }: NP
           <button
             onClick={() => onUpdateHealth(npc.current_health + 1)}
             disabled={npc.current_health >= npc.max_health}
-            className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white p-1 rounded"
+            className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white p-2 rounded-lg"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-6 h-6" />
           </button>
         </div>
       </div>
@@ -216,8 +217,9 @@ export function NPCCard({ npc, onUpdateHealth, onToggleCondition, onDelete }: NP
               <span
                 key={condition}
                 onClick={() => onToggleCondition(condition as Condition)}
-                className="bg-purple-600 text-white px-2 py-1 rounded text-xs cursor-pointer hover:bg-purple-700 transition-colors"
+                className="bg-purple-600 text-white px-3 py-2 rounded text-sm cursor-pointer hover:bg-purple-700 transition-colors flex items-center gap-2"
               >
+                <ConditionIcon conditionName={condition} size="md" />
                 {condition}
               </span>
             ))}
@@ -231,12 +233,13 @@ export function NPCCard({ npc, onUpdateHealth, onToggleCondition, onDelete }: NP
                 key={condition}
                 onClick={() => onToggleCondition(condition as Condition)}
                 className={clsx(
-                  'px-2 py-1 rounded text-xs font-medium transition-colors',
+                  'px-3 py-2 rounded text-sm font-medium transition-colors flex items-center gap-2',
                   npc.conditions.includes(condition)
                     ? 'bg-purple-600 text-white'
                     : 'bg-white/20 text-gray-300 hover:bg-white/30'
                 )}
               >
+                <ConditionIcon conditionName={condition} size="md" />
                 {condition}
               </button>
             ))}

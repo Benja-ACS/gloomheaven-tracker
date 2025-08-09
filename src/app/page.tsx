@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Plus, Sword, Shield, Menu, House, BookOpen, Settings } from 'lucide-react'
 import { ScenarioCreator } from '@/components/ScenarioCreator'
+import { TwoStepScenarioCreator } from '@/components/TwoStepScenarioCreator'
 import { ScenarioManager } from '@/components/ScenarioManager'
 import { BackgroundWrapper } from '@/components/ui/BackgroundWrapper'
 import { Button } from '@/components/ui/Button'
@@ -13,7 +14,8 @@ export default function Home() {
   const [currentScenario, setCurrentScenario] = useState<Scenario | null>(null)
   const [showCreator, setShowCreator] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
-  const { logo } = useTheme()
+  const [creatorKey, setCreatorKey] = useState(0) // Key to force component reset
+  const { logo, title } = useTheme()
 
   const handleScenarioCreated = (scenario: Scenario) => {
     setCurrentScenario(scenario)
@@ -23,6 +25,7 @@ export default function Home() {
   const handleNewScenario = () => {
     setCurrentScenario(null)
     setShowCreator(true)
+    setCreatorKey(prev => prev + 1) // Force new component instance
   }
 
   const handleHome = () => {
@@ -37,25 +40,17 @@ export default function Home() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo/Title */}
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                {logo ? (
-                  <img 
-                    src={logo} 
-                    alt="Gloomhaven Logo" 
-                    className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain"
-                  />
-                ) : (
-                  <>
-                    <Sword className="text-yellow-400 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16" />
-                    <Shield className="text-blue-400 w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 absolute -top-1 -right-1" />
-                  </>
-                )}
-              </div>
-              <div>
+            <div className="flex flex-col items-center">
+              {title ? (
+                <img 
+                  src={title} 
+                  alt="Gloomhaven Tracker" 
+                  className="h-8 sm:h-10 md:h-12 object-contain mb-1"
+                />
+              ) : (
                 <h1 className="text-2xl font-bold text-white">Gloomhaven Tracker</h1>
-                <p className="text-gray-400 text-sm hidden sm:block">Scenario & Monster Management</p>
-              </div>
+              )}
+              <p className="text-gray-400 text-sm hidden sm:block">Scenario & Monster Management</p>
             </div>
 
             {/* Desktop Navigation */}
@@ -168,8 +163,16 @@ export default function Home() {
               <div className="text-center animate-fade-in">
                 <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-sm rounded-2xl p-8 max-w-lg mx-auto border border-white/20 shadow-2xl">
                   <div className="mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Sword className="w-8 h-8 text-white" />
+                    <div className="w-40 h-40 flex items-center justify-center mx-auto mb-4">
+                      {logo ? (
+                        <img 
+                          src={logo} 
+                          alt="Gloomhaven Logo" 
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <Sword className="w-20 h-20 text-white" />
+                      )}
                     </div>
                     <h2 className="text-3xl font-bold text-white mb-3">
                       Welcome Back, Adventurer!
@@ -209,7 +212,8 @@ export default function Home() {
             </div>
           ) : showCreator ? (
             <div className="animate-slide-in-up">
-              <ScenarioCreator
+              <TwoStepScenarioCreator
+                key={creatorKey} // Force new instance when key changes
                 onScenarioCreated={handleScenarioCreated}
                 onCancel={() => setShowCreator(false)}
               />

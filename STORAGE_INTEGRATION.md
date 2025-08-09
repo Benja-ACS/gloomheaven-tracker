@@ -1,4 +1,17 @@
-# Supabase Storage Integration
+# Supabase Storage Integ### **4. `conditions` Bucket**
+Contains condition icons for status effects:
+- **File naming convention**: `{condition-name}.png` (lowercase)
+- **Example**: `poison.png` for "Poison" condition
+- **Supported conditions**: Poison, Wound, Immobilize, Disarm, Stun, Muddle, Invisible, Strengthen, Bless, Curse
+- **Usage**: Icons appear next to condition names in the NPCCard component
+
+## UI/UX Features
+
+### **Quick Add Monster Buttons**
+- Monster groups display "Add Normal" and "Add Elite" buttons in group headers
+- Allows fast addition of monsters to existing groups without using main "Add Monster" flow
+- Boss groups don't show these buttons (single boss per scenario design)
+- Improves workflow for adding multiple monsters of same type
 
 This document outlines the integration of Supabase storage buckets into the Gloomhaven Tracker application.
 
@@ -22,6 +35,13 @@ Contains boss images:
 - **Example**: `gh-jekserah.png` for "Jekserah" boss
 - **Matching logic**: Same as monsters - normalizes names for matching
 
+### 4. `conditions` Bucket
+Contains condition icons for status effects:
+- **File naming convention**: `{condition-name}.png` (lowercase)
+- **Example**: `poison.png` for "Poison" condition
+- **Supported conditions**: Poison, Wound, Immobilize, Disarm, Stun, Muddle, Invisible, Strengthen, Bless, Curse
+- **Usage**: Icons appear next to condition names in the NPCCard component
+
 ## Implementation Details
 
 ### File Structure
@@ -34,6 +54,7 @@ src/
 ├── components/
 │   └── ui/
 │       ├── CreatureImage.tsx    # Component for monster/boss images
+│       ├── ConditionIcon.tsx    # Component for condition icons
 │       └── BackgroundWrapper.tsx # Dynamic background component
 ```
 
@@ -41,9 +62,15 @@ src/
 
 #### `storage.ts`
 - `getStorageUrl()`: Gets public URL for storage files
+- `getConditionIconUrl()`: Gets condition icon URL from conditions bucket
 - `getThemeAssets()`: Loads theme background and logo
 - `getCreatureImageWithFallback()`: Smart creature image loading with fallback
 - `listBucketFiles()`: Lists files in a storage bucket
+
+#### `ConditionIcon.tsx`
+- Displays condition icons with fallback to first letter
+- Supports multiple sizes (sm/md/lg)
+- Handles image loading errors gracefully
 
 #### `CreatureImage.tsx`
 - Displays monster/boss images with loading states

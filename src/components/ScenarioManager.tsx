@@ -254,6 +254,15 @@ export function ScenarioManager({ scenario, onNewScenario }: ScenarioManagerProp
     }
   }
 
+  // Quick add functions for existing monster groups
+  const quickAddNormal = async (monsterName: string) => {
+    await addMonsterToScenario(monsterName, 'Normal', 'monster', 1)
+  }
+
+  const quickAddElite = async (monsterName: string) => {
+    await addMonsterToScenario(monsterName, 'Elite', 'monster', 1)
+  }
+
   const monsters = npcs.filter(npc => npc.type === 'monster')
   const bosses = npcs.filter(npc => npc.type === 'boss')
   const aliveNPCs = npcs.filter(npc => npc.current_health > 0)
@@ -379,8 +388,31 @@ export function ScenarioManager({ scenario, onNewScenario }: ScenarioManagerProp
                     />
                     <h3 className="text-lg font-semibold text-white">{groupName}</h3>
                   </div>
-                  <div className="text-sm text-gray-300">
-                    {aliveInGroup.length} alive • {deadInGroup.length} defeated
+                  <div className="flex items-center gap-4">
+                    {/* Quick Add buttons - only for monsters, not bosses */}
+                    {groupNPCs[0]?.type === 'monster' && (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => quickAddNormal(groupName)}
+                          disabled={addingMonster}
+                          className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-3 py-1 rounded-lg text-sm flex items-center gap-1 transition-colors"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Add Normal
+                        </button>
+                        <button
+                          onClick={() => quickAddElite(groupName)}
+                          disabled={addingMonster}
+                          className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-3 py-1 rounded-lg text-sm flex items-center gap-1 transition-colors"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Add Elite
+                        </button>
+                      </div>
+                    )}
+                    <div className="text-sm text-gray-300">
+                      {aliveInGroup.length} alive • {deadInGroup.length} defeated
+                    </div>
                   </div>
                 </div>
                 
