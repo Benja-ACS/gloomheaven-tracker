@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { Plus, Sword, Shield, Menu, House, BookOpen, Settings } from 'lucide-react'
-import { ScenarioCreator } from '@/components/ScenarioCreator'
 import { TwoStepScenarioCreator } from '@/components/TwoStepScenarioCreator'
 import { ScenarioManager } from '@/components/ScenarioManager'
 import { BackgroundWrapper } from '@/components/ui/BackgroundWrapper'

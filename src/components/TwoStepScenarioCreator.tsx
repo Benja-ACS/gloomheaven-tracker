@@ -158,7 +158,7 @@ export function TwoStepScenarioCreator({ onScenarioCreated, onCancel }: TwoStepS
             </Button>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
               <div className="text-sm font-semibold text-white">
-                Step 2: Add creatures to "{scenarioConfig.name}"
+                Step 2: Add creatures to &ldquo;{scenarioConfig.name}&rdquo;
               </div>
               <div className="text-xs text-purple-200">
                 Level {scenarioConfig.level} • {scenarioConfig.playerCount} player{scenarioConfig.playerCount !== 1 ? 's' : ''}

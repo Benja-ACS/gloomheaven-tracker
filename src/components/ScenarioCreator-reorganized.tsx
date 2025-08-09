@@ -312,7 +312,7 @@ export function ScenarioCreator({ onScenarioCreated, onCancel, initialConfig }: 
             <div className="grid grid-cols-1 gap-2 max-h-96 overflow-y-auto">
               {filteredMonsters.length === 0 && monsterSearch ? (
                 <div className="text-gray-400 text-center py-4">
-                  No monsters found matching "{monsterSearch}"
+                  No monsters found matching &ldquo;{monsterSearch}&rdquo;
                 </div>
               ) : (
                 filteredMonsters.map((monsterName) => (
@@ -382,7 +382,7 @@ export function ScenarioCreator({ onScenarioCreated, onCancel, initialConfig }: 
             <div className="grid grid-cols-1 gap-2 max-h-96 overflow-y-auto">
               {filteredBosses.length === 0 && bossSearch ? (
                 <div className="text-gray-400 text-center py-4">
-                  No bosses found matching "{bossSearch}"
+                  No bosses found matching &ldquo;{bossSearch}&rdquo;
                 </div>
               ) : (
                 filteredBosses.map((bossName) => (
